@@ -1,4 +1,4 @@
-import User from '@/src';
+import User from '@/src/user';
 
 export default async (req, res) => {
   const {
