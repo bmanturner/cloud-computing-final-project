@@ -12,7 +12,7 @@ body: username, password (min 5 characters), email
 returns: user record (w/ apiKey)
 
 - `POST: /api/users/login`  
-username, password  
+username, password  ('demouser', 'demopassword')
 returns: user record (w/ apiKey)
 
 ## Python Script
