@@ -3,7 +3,7 @@ CS 403/633/733 Final Project - Dropbox Clone
 
 ## Server/UI
 
-Requirements: Node v10 or v12
+Requirements: Node v10 or newer
 
 Environment variables:
 
