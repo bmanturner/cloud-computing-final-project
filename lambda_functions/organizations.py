@@ -7,7 +7,7 @@ import pymysql.cursors
 
 ## GLOBALS
 
-db = pymysql.connect(host=os.environ["DB_HOST"], user=os.environ["DB_USERNAME"], passwd=os.environ["DB_PASSWORD"], db=os.environ["DB_NAME"], cursorclass=pymysql.cursors.DictCursor)
+db = pymysql.connect(host=os.environ["DB_HOST"], user=os.environ["DB_USERNAME"],passwd=os.environ["DB_PASSWORD"], db=os.environ["DB_NAME"], cursorclass=pymysql.cursors.DictCursor)
 
 ## HELPERS
 
@@ -29,7 +29,7 @@ def authenticate_api_key(event):
             raise Exception("This user is not an admin")
         return user
 
-## FUNCTIONS
+## UNAUTHENTICATED FUNCTIONS
 
 # returns list of organizations
 def get_organizations(event, context):
@@ -40,6 +40,10 @@ def get_organizations(event, context):
         result["body"] = json.dumps(cursor.fetchall(), default=mysql_converter)
         return result
 
+## AUTHENTICATED FUNCTIONS (api_key required) 
+
+# admin can create organizations
+# org_admin can not
 def create_organization(event, context):
     result = {}
     try:
@@ -78,8 +82,10 @@ def create_organization(event, context):
         return result
 
 if __name__ == "__main__":
+    print(get_organizations('',''))
+    
     req = {}
-    req["name"] = "Alpha Dynamics"
-    req["s3_prefix"] = "alpha-dynamics"
-    req["api_key"] = "651b5ca0-c568-4cb2-9e33-ac9ac4d3d224"
-    print(create_organization(req, ''))
+    req["name"] = "Test Organization"
+    req["s3_prefix"] = "test-organization"
+    req["api_key"] = "2b0e6a26-4b4a-4461-96b7-9085de4cc344"
+    # print(create_organization(req, ''))
