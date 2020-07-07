@@ -55,7 +55,6 @@ def create_organization(event, context):
 
     name = event["name"]
     s3_prefix = event["s3_prefix"].lower()
-    result = {}
     if " " in s3_prefix:
         result["status"] = 400
         result["body"] = "s3_prefix can not contain spaces"
