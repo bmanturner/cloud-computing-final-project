@@ -12,7 +12,7 @@ from configparser import ConfigParser
 import keyring
 
 def version():
-    return '2.2'
+    return '2.9'
 
 def readConfig(section,key,default = '',config_file = 'config.ini'):
     # Read Configuration settings saved on local drive (E.g. LastRun_utc)
@@ -219,6 +219,9 @@ def downloadModifiedFilesSinceLastRun(keysdatafile,bucketname,download_lst,boxpa
             
 def setLastRun():
     writeConfig('Main','LastRun_utc',str(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")))
+
+def resetLastRun():
+    writeConfig('Main','LastRun_utc',"1900-01-01 00:00:00")   
     
 def getLastRun():
     return readConfig('Main','LastRun_utc','1900-01-01 00:00:00')
@@ -247,11 +250,18 @@ def setorg(org):
 def getorg():
     return readConfig('Main','org','')
 
-def setpassword():
-    keyring.set_password(Application_Name, username, password)
+
+def setboxpath(boxpath):
+    writeConfig('Main','boxpath',boxpath)
     
-def getpassword():
-    return keyring.get_password(Application_Name, username)
+def getboxpath():
+    return readConfig('Main','boxpath','')
+
+def setpassword(username, password):
+    keyring.set_password('Sharebox', username, password)
+    
+def getpassword(username):
+    return keyring.get_password('Sharebox', username)
 
 def login(Application_Name,username,password):
     ret = False
@@ -269,6 +279,8 @@ def login(Application_Name,username,password):
         setorg(org)
         setapikey(api_key)
         setrole(role)
+        setuser(username)
+        setpassword(username, password)
         ret = True
     return ret
     
