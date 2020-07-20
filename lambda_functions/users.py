@@ -164,6 +164,44 @@ def edit_user_role(event, context):
     result["body"] = "Successfully updated user role"
     return result
 
+def delete_user(event, context):
+    result = {}
+    try:
+        calling_user = authenticate_api_key(event)
+    except Exception as e:
+        result["status"] = 401
+        result["body"] = repr(e)
+        return result
+    
+    user_id = event["user_id"]
+
+    # check org of user to update to enforce update role rules
+    with db.cursor() as cursor:
+        cursor.execute("SELECT * FROM Users WHERE id = %s", (user_id, ))
+        user = cursor.fetchone()
+        if user is None:
+            result["status"] = 404
+            result["body"] = "A user with that user_id does not exist"
+            return result
+    if calling_user["role"] == "org_admin" and calling_user["org_id"] != user["org_id"]:
+        result["status"] = 401
+        result["body"] = "An org_admin user can only modify users in their own organization"
+        return result
+
+    # update user role
+    try: 
+        with db.cursor() as cursor:
+            cursor.execute("DELETE FROM Users WHERE id = %s", (user_id,))
+        db.commit()
+    except Exception as e:
+        result["status"] = 500
+        result["body"] = repr(e)
+
+    result["status"] = 200
+    result["body"] = "Successfully deleted user"
+    return result
+    
+
 if __name__ == "__main__":
     print(get_users('', ''))
 
