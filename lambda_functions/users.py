@@ -42,6 +42,7 @@ def get_users(event, context):
         return result
 
 def get_organization_users(event, context):
+    event = json.loads(event['body'])
     org_id = event["org_id"]
     with db.cursor() as cursor:
         cursor.execute("SELECT * FROM Users WHERE org_id = %s", (org_id, ))
@@ -51,6 +52,7 @@ def get_organization_users(event, context):
         return result
 
 def login(event, context):
+    event = json.loads(event['body'])
     username = event["username"]
     password = event["password"]
 
@@ -79,6 +81,7 @@ def login(event, context):
 # admin can create users in any organization
 # org_admin can only create users in their own organization
 def register_user(event, context):
+    event = json.loads(event['body'])
     result = {}
     try:
         calling_user = authenticate_api_key(event)
@@ -93,9 +96,9 @@ def register_user(event, context):
     role = event["role"]
     org_id = event["org_id"]
     # check valid role
-    if role not in ["admin", "org_admin", "client"]:
+    if role not in ["admin", "org_admin", "readonly", "readwrite"]:
         result["status"] = 400
-        result["body"] = "Possible roles are admin, org_admin, and client"
+        result["body"] = "Possible roles are org_admin, readonly, and readwrite"
         return result
     # enforce user creation rules
     if calling_user["role"] == "org_admin" and calling_user["org_id"] != org_id:
@@ -123,6 +126,7 @@ def register_user(event, context):
 # admin can edit any user role
 # org_admin can only edit user role in their organization
 def edit_user_role(event, context):
+    event = json.loads(event['body'])
     result = {}
     try:
         calling_user = authenticate_api_key(event)
@@ -165,6 +169,7 @@ def edit_user_role(event, context):
     return result
 
 def delete_user(event, context):
+    event = json.loads(event['body'])
     result = {}
     try:
         calling_user = authenticate_api_key(event)

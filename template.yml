@@ -1,0 +1,157 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Lambda application that calls the Lambda API.
+Resources:
+  getusers:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: users.get_users
+      Runtime: python3.8
+      CodeUri: lambda_functions/.
+      Description: Get all sharebox users
+      Timeout: 10
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+      Tracing: Active
+      Layers:
+        - !Ref libs
+  getorganizationusers:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: users.get_organization_users
+      Runtime: python3.8
+      CodeUri: lambda_functions/.
+      Description: Get all sharebox users in an organization
+      Timeout: 10
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+      Tracing: Active
+      Layers:
+        - !Ref libs
+  getorganizationusers:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: users.get_organization_users
+      Runtime: python3.8
+      CodeUri: lambda_functions/.
+      Description: Get all sharebox users in an organization
+      Timeout: 10
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+      Tracing: Active
+      Layers:
+        - !Ref libs
+  login:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: users.login
+      Runtime: python3.8
+      CodeUri: lambda_functions/.
+      Description: Use user credentials to retrieve api key
+      Timeout: 10
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+      Tracing: Active
+      Layers:
+        - !Ref libs
+  registeruser:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: users.register_user
+      Runtime: python3.8
+      CodeUri: lambda_functions/.
+      Description: Create a new user
+      Timeout: 10
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+      Tracing: Active
+      Layers:
+        - !Ref libs
+  edituserrole:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: users.edit_user_role
+      Runtime: python3.8
+      CodeUri: lambda_functions/.
+      Description: Use user credentials to retrieve api key
+      Timeout: 10
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+      Tracing: Active
+      Layers:
+        - !Ref libs
+  deleteuser:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: users.delete_user
+      Runtime: python3.8
+      CodeUri: lambda_functions/.
+      Description: Remove a user by user id
+      Timeout: 10
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+      Tracing: Active
+      Layers:
+        - !Ref libs
+  getorganizations:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: organizations.get_organizations
+      Runtime: python3.8
+      CodeUri: lambda_functions/.
+      Description: Retrieve list of organizations
+      Timeout: 10
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+      Tracing: Active
+      Layers:
+        - !Ref libs
+  createorganization:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: organizations.create_organization
+      Runtime: python3.8
+      CodeUri: lambda_functions/.
+      Description: Create an organization
+      Timeout: 10
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+      Tracing: Active
+      Layers:
+        - !Ref libs
+  libs:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: sharebox-lib
+      Description: Dependencies for the sharebox app.
+      ContentUri: package/.
+      CompatibleRuntimes:
+        - python3.8

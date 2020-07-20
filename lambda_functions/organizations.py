@@ -45,6 +45,7 @@ def get_organizations(event, context):
 # admin can create organizations
 # org_admin can not
 def create_organization(event, context):
+    event = json.loads(event['body'])
     result = {}
     try:
         authenticate_api_key(event)
