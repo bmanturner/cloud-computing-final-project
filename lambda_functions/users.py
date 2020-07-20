@@ -131,8 +131,8 @@ def edit_user_role(event, context):
         result["body"] = repr(e)
         return result
     
-    user_id = req["user_id"]
-    new_role = req["role"]
+    user_id = event["user_id"]
+    new_role = event["role"]
     if new_role not in ["admin", "org_admin", "client"]:
         result["status"] = 400
         result["body"] = "Possible roles are admin, org_admin, and client"
