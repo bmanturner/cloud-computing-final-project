@@ -137,9 +137,9 @@ def edit_user_role(event, context):
     
     user_id = event["user_id"]
     new_role = event["role"]
-    if new_role not in ["admin", "org_admin", "client"]:
+    if new_role not in ["admin", "org_admin", "readonly", "readwrite"]:
         result["status"] = 400
-        result["body"] = "Possible roles are admin, org_admin, and client"
+        result["body"] = "Possible roles are org_admin, readonly, and readwrite"
         return result
 
     # check org of user to update to enforce update role rules
