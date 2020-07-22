@@ -168,6 +168,35 @@ def edit_user_role(event, context):
     result["body"] = "Successfully updated user role"
     return result
 
+def get_user(event, context):
+    event = json.loads(event['body'])
+    result = {}
+    try:
+        calling_user = authenticate_api_key(event)
+    except Exception as e:
+        result["status"] = 401
+        result["body"] = repr(e)
+        return result
+    
+    username = event["username"]
+
+    # check org of user to update to enforce update role rules
+    with db.cursor() as cursor:
+        cursor.execute("SELECT * FROM Users WHERE username = %s", (username, ))
+        user = cursor.fetchone()
+        if user is None:
+            result["status"] = 404
+            result["body"] = "A user with that username does not exist"
+            return result
+    if calling_user["role"] == "org_admin" and calling_user["org_id"] != user["org_id"]:
+        result["status"] = 401
+        result["body"] = "An org_admin user can only modify users in their own organization"
+        return result
+
+    result["status"] = 200
+    result["body"] = json.dumps(user, default=mysql_converter)
+    return result
+
 def delete_user(event, context):
     event = json.loads(event['body'])
     result = {}
@@ -208,11 +237,7 @@ def delete_user(event, context):
     
 
 if __name__ == "__main__":
-    print(get_users('', ''))
-
-
     req = {}
-    req["role"] = "client"
-    req["api_key"] = "2b0e6a26-4b4a-4461-96b7-9085de4cc344"
-    req["user_id"] = 79
-    # print(edit_user_role(req, ''))
+    req["api_key"] = "bf7e5609-dfc4-42ed-afd5-f342d3f9bc13"
+    req["username"] = "demouser1"
+    print(get_user(req, ''))
