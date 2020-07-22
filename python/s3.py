@@ -10,9 +10,11 @@ import os
 from datetime import datetime, timezone
 from configparser import ConfigParser
 import keyring
+import requests
+import json
 
 def version():
-    return '2.9'
+    return '1.04'
 
 def readConfig(section,key,default = '',config_file = 'config.ini'):
     # Read Configuration settings saved on local drive (E.g. LastRun_utc)
@@ -263,26 +265,57 @@ def setpassword(username, password):
 def getpassword(username):
     return keyring.get_password('Sharebox', username)
 
-def login(Application_Name,username,password):
+def setorgname(orgname):
+    writeConfig('Main','orgname',orgname)
+    
+def getorgname():
+    return readConfig('Main','orgname','')
+
+def seturl(url):
+    writeConfig('Main','url',url)
+    
+def geturl():
+    return readConfig('Main','url','https://l0er6wogrg.execute-api.us-east-1.amazonaws.com/prod')
+
+def login(username,password):
     ret = False
-    if Application_Name == '':
-        Application_Name = 'Sharebox'
     if username != '' and password !='':
         # Do API login call
-        
-        # Get User Record. Parse api_key, org and role
-        # Return api_key, org and role
-        api_key = '2b0e6a26-4b4a-4461-96b7-9085de4cc344'
-        org_id = 6 # Get Org based on org_id
-        org = 'test-organization'
-        role = 'RW'    
-        setorg(org)
-        setapikey(api_key)
-        setrole(role)
-        setuser(username)
-        setpassword(username, password)
-        ret = True
+        func = '/login'
+        errMsg = ''
+        uri = geturl()
+        site = uri + func
+        args = {'username':username,'password':password }
+        response = requests.post(url=site, json = args )
+    
+        if response.status_code == 200:
+            setuser(username)
+            setpassword(username, password)
+            try:
+                obj = json.dumps(response.json())
+                success_dict = json.loads(obj)
+                if success_dict['status'] != 200:
+                    ret = False
+                else:
+                    ret = True
+                    body = success_dict['body']
+                    person_dict = json.loads(body)
+                    if 'role' in person_dict:
+                        role = person_dict['role']
+                        setrole(role)
+
+                    if 'org' in person_dict:
+                        org = person_dict['org']['s3_prefix']
+                        orgname = person_dict['org']['name']
+                        setorg(org)
+                        setorgname(orgname)
+                        
+            except:
+                ret = False
+        else:
+            ret = False
     return ret
+
     
 
 
