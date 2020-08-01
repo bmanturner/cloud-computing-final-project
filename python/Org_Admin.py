@@ -1,6 +1,22 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+'''''
+ShareBox (Admin)
+
+Cloud Computing Final Project
+
+Team: Open Group
+
+Team Members: Abdullateef A, Sumanth B, Brendan T, Ryna B, Freddie Z
+
+# Requires to be with the following files in the same directory
+
+1. AWS credentials: Awskeys.txt (Communication with S3)
+2. s3.py (Communication with S3)
+3. Client.py (End User)
+
+'''''
 
 # Working copy
 import os
@@ -14,7 +30,7 @@ from PyQt5.QtWidgets import (QApplication, QGridLayout, QGroupBox, QListWidgetIt
 
 Title = 'ShareBox'
 url_prefix = 'https://l0er6wogrg.execute-api.us-east-1.amazonaws.com/prod'
-UIVersion = '2.0.07222020'
+UIVersion = '2.0.08012020'
 
 class MyWindow(QtWidgets.QWidget):
     def __init__(self):

@@ -1,6 +1,23 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+'''''
+ShareBox
+
+Cloud Computing Final Project
+
+Team: Open Group
+
+Team Members: Sumanth B, Abdullateef A, Brendan T, Ryna B, Freddie Z
+
+# Requires the following files in the same directory
+
+1. AWS credentials: Awskeys.txt (Communication with S3)
+2. Client.py (End User)
+3. Org_Admin.py (Administration)
+
+'''''
+
 # In[14]:
 
 
@@ -14,7 +31,7 @@ import requests
 import json
 
 def version():
-    return '1.04'
+    return '2.0'
 
 def readConfig(section,key,default = '',config_file = 'config.ini'):
     # Read Configuration settings saved on local drive (E.g. LastRun_utc)

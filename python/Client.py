@@ -1,19 +1,28 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[3]:
 
 
-# Requires
 '''''
-1. AWS credentials: Awskeys.txt
-2. s3.py
-3. user.py
-4. Org_Admin.py
+ShareBox
+
+Cloud Computing Final Project
+
+Team: Open Group
+
+Team Members: Sumanth B, Abdullateef A, Brendan T, Ryna B, Freddie Z
+
+# Requires the following files in the same directory
+
+1. AWS credentials: Awskeys.txt (Communication with S3)
+2. s3.py (Communication with S3)
+3. Org_Admin.py (Administration)
+
 '''''
 
 
-# In[6]:
+# In[4]:
 
 
 # Working copy
@@ -47,7 +56,7 @@ bucketname = ''
 role = ''
 droppedFiles = []
 logcount = 0
-UIVersion = '2.0.07182020'
+UIVersion = '2.0.08012020'
 
 
 
@@ -88,6 +97,10 @@ class DropArea(QtWidgets.QPushButton):
             super(DropArea,self).dropEvent(event)
 
 class ShareboxClient(QtWidgets.QWidget):
+    '''
+    Main End-user Window
+    
+    '''
     def __init__(self):
         super(ShareboxClient,self).__init__()
 
@@ -201,7 +214,11 @@ class ShareboxClient(QtWidgets.QWidget):
         # Disable buttons on load
         self.btnEnable(False)
         
-        # Get exisiting config values
+        '''
+        # Get config values and set to text boxes for login
+    
+        '''
+        
         username = s3.getuser()
         if username.strip() !='':
 
@@ -209,7 +226,10 @@ class ShareboxClient(QtWidgets.QWidget):
             self.txtpwd.setText(s3.getpassword(username))
         
         boxpath = s3.getboxpath()
-        
+        '''
+        # Start logging with version information
+    
+        '''
         self.addLog('Start Session')
         self.addLog('Sharebox UI Version: ' + UIVersion)
         self.addLog('s3 Library Version: ' + s3.version())
@@ -218,6 +238,15 @@ class ShareboxClient(QtWidgets.QWidget):
     def drop_event(self):
         # gets executed on drop via signal
         self.add_files()
+        
+    '''
+    ReUpload: 
+    Requires a selection in the list box
+    Will overwrite the file in S3 with local file
+    Requires Role: "ReadWrite" or "Org_Admin"
+    Communicates with s3
+    
+    '''        
         
     def ReUpload(self):
         global droppedFiles
@@ -236,7 +265,14 @@ class ShareboxClient(QtWidgets.QWidget):
         droppedFiles.append(file)
         self.add_files()
         
-
+    '''
+    add_files: 
+    Called by 1) Drag and drop on Browse button  or 2) Click event of Browse button.
+    File will be uploaded to S3
+    Requires Role: "ReadWrite" or "Org_Admin"
+    Communicates with s3
+    
+    '''     
     def add_files(self): 
         if role == 'readonly':
             self.addLog('No upload rights')
@@ -282,7 +318,18 @@ class ShareboxClient(QtWidgets.QWidget):
             
     def syncforce(self):   
         self.download(True)
-            
+        
+    '''
+    download: 
+    Called by 
+    1) Sync: Will check last run time and get files modified or created since then 
+    2) Sync (Get All): Will get all
+    
+    File(s) will be downloaded from S3
+    Requires Role: No Role restriction
+    Communicates with s3
+    '''
+
     def download(self,forceDownload):   
         try:
             s3_file_dir_lst = s3.listS3Files(keysdatafile,bucketname,org)
@@ -300,6 +347,13 @@ class ShareboxClient(QtWidgets.QWidget):
         except:
             QMessageBox.critical(self, Title, "Upload failed!") 
 
+    '''
+    deleteFile: 
+    Requires a selection in the list box
+    Will delete the file in S3 and the local file
+    Requires Role: "ReadWrite" or "Org_Admin"
+    Communicates with s3
+    '''            
     def deleteFile(self):
         if role == 'readonly':
             self.addLog('No delete rights')
@@ -332,6 +386,11 @@ class ShareboxClient(QtWidgets.QWidget):
                     except:
                         QMessageBox.critical(self, Title, "Delete failed!") 
                         
+    '''
+    addFolder: 
+    Creates local folder (Folder and sub-folders are set as prefix to the documents uploaded)
+    Requires Role: "ReadWrite" or "Org_Admin"
+    '''                            
     def addFolder(self):
         if role == 'readonly':
             self.addLog('No upload rights')
@@ -401,6 +460,12 @@ class ShareboxClient(QtWidgets.QWidget):
             
             self.openFile(fullpath)
 
+    '''
+    addLog: 
+    Add entries to log list
+    Valid for the current session
+    Requires Role: No Role restriction
+    '''     
     def addLog(self,val):
         global logcount
         logcount += 1
@@ -420,7 +485,16 @@ class ShareboxClient(QtWidgets.QWidget):
                 self.selectionAction()
                 break
             self.listView.sortItems()
-          
+    '''
+    load: 
+    Called at login
+    Get Organization Name and ID
+    Get Role
+    If first use, set local ShareBox Directory
+    If Windows, set default to Documents
+    Set Window title with User and Org info
+    Requires Role: No Role restriction
+    '''             
     def load(self):
         global currentparentpath,keysdatafile,bucketname,boxpath,orgpath,org,orgname,role
         try:
@@ -460,7 +534,10 @@ class ShareboxClient(QtWidgets.QWidget):
 
     def exit(self):
         self.close()  
-        
+    '''
+    login: 
+    Call communicates with API-Gateway
+    '''          
     def login(self):
         username = self.txtuser.text().strip()
         userpassword = self.txtpwd.text().strip()
@@ -472,7 +549,10 @@ class ShareboxClient(QtWidgets.QWidget):
                 self.load()
             else:
                 QMessageBox.critical(self, Title, "Login failed!") 
-                
+    '''
+    btnEnable: 
+    Enable button on login and based on user rights
+    '''               
     def btnEnable(self,value):
         self.btnSync.setEnabled(value)
         self.btnList.setEnabled(value)
@@ -491,15 +571,25 @@ class ShareboxClient(QtWidgets.QWidget):
             self.btnDA.setEnabled(value)
             self.btnDelete.setEnabled(value)
             self.btnReUpload.setEnabled(value)
-
+    '''
+    openFile: 
+    Open file selection from list box
+    '''   
     def openFile(self,fileName):
         webbrowser.open(fileName)
-
+    '''
+    Admin: 
+    Open Admin console
+    ''' 
     def Admin(self):
         self.addLog('Admin Event')
         self.child_win = MyWindow()
         self.child_win.show()
-        
+    '''
+    about: 
+    Application Version
+    Group Information
+    '''           
     def about(self):
         self.addLog('About Event')
         QMessageBox.about(self, Title, "ShareBox:\n~A Dropbox inspired application\n\nVersion " + UIVersion + "\n\nFinal Project for Cloud Computing\n\nDeveloped by 'Open Group'\nTeam - Brendan T, Sumanth B, Abdullateef A, Freddie Z, and Ryan B") 
